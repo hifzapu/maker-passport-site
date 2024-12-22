@@ -69,6 +69,7 @@ defmodule MakerPassportWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{MakerPassportWeb.UserAuth, :ensure_authenticated}] do
+      live "/users/email_confirmation", ResendEmailConfirmation, :index
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 

@@ -29,7 +29,7 @@ defmodule MakerPassportWeb.UserAuth do
   disconnected on log out. The line can be safely removed
   if you are not using LiveView.
   """
-  def log_in_user(conn, user, params \\ %{}) do
+  def log_in_user(conn, user, params \\ %{}, info \\ nil) do
     token = Accounts.generate_user_session_token(user)
     user_return_to = get_session(conn, :user_return_to)
 
@@ -37,7 +37,7 @@ defmodule MakerPassportWeb.UserAuth do
     |> renew_session()
     |> put_token_in_session(token)
     |> maybe_write_remember_me_cookie(token, params)
-    |> redirect(to: user_return_to || signed_in_path(conn))
+    |> redirect(to: user_return_to || signed_in_path(conn, user, info))
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
@@ -172,7 +172,7 @@ defmodule MakerPassportWeb.UserAuth do
     socket = mount_current_user(socket, session)
 
     if socket.assigns.current_user do
-      {:halt, Phoenix.LiveView.redirect(socket, to: signed_in_path(socket))}
+      {:halt, Phoenix.LiveView.redirect(socket, to: signed_in_path(socket.assigns.current_user, socket))}
     else
       {:cont, socket}
     end
@@ -192,7 +192,7 @@ defmodule MakerPassportWeb.UserAuth do
   def redirect_if_user_is_authenticated(conn, _opts) do
     if conn.assigns[:current_user] do
       conn
-      |> redirect(to: signed_in_path(conn))
+      |> redirect(to: signed_in_path(conn.assigns.current_user, conn))
       |> halt()
     else
       conn
@@ -229,5 +229,12 @@ defmodule MakerPassportWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: ~p"/"
+  def signed_in_path(_conn, _user, "Account created successfully!"), do: ~p"/"
+
+  def signed_in_path(conn, user, _), do: signed_in_path(conn, user)
+
+  def signed_in_path(_conn, %{confirmed_at: nil}), do: ~p"/users/email_confirmation"
+
+  def signed_in_path(_conn, _user), do: ~p"/"
+
 end
