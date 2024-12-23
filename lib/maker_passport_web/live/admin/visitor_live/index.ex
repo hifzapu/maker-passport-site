@@ -11,9 +11,11 @@ defmodule MakerPassportWeb.Admin.VisitorLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     visitors = Visitor.list_visitors()
+    form = to_form(%{}, as: "visitor")
 
     socket =
       socket
+      |> assign(form: form)
       |> assign(visitors: visitors)
 
     {:ok, socket}
@@ -25,6 +27,11 @@ defmodule MakerPassportWeb.Admin.VisitorLive.Index do
     {:ok, _} = Visitor.update_and_verify_visitor(visitor)
 
     {:noreply, socket |> put_flash(:info, "We have sent an email link to #{visitor.email}.")}
+  end
+
+  def handle_event("filter", %{"status" => status}, socket) do
+    visitors = Visitor.list_visitors(%{"status" => status})
+    {:noreply, socket |> assign(visitors: visitors)}
   end
 
   def fetch_subject(socket, _params) do

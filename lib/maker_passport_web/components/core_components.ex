@@ -269,7 +269,7 @@ defmodule MakerPassportWeb.CoreComponents do
   """
   attr :id, :any, default: nil
   attr :class, :string, default: ""
-  attr :name, :any
+  attr :name, :any, default: nil
   attr :label, :string, default: nil
   attr :value, :any
 
@@ -332,8 +332,7 @@ defmodule MakerPassportWeb.CoreComponents do
     ~H"""
     <div>
       <.label for={@id}><%= @label %></.label>
-      <select id={@id} name={@name} class="select select-bordered w-full max-w-xs" <>
-        @class
+      <select id={@id} name={@name} class={"select select-bordered w-full max-w-xs " <> @class}
         multiple={@multiple}
         {@rest}
         >

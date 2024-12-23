@@ -1,11 +1,28 @@
 <div class="container mx-auto px-4 py-8">
   <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Visitors</h2>
+
+  <div class="flex justify-end mb-4">
+    <.simple_form for={@form} id="filter_form" phx-change="filter">
+      <.input
+        field={@form[:status]}
+        name="status"
+        type="select"
+        prompt="Select status"
+        options={["Email verified", "Email unverified"]}
+      />
+    </.simple_form>
+  </div>
+
   <div class="bg-white rounded-lg shadow-md">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-white">
         <tr>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
-          <th scope="col" class="px-6 py-3 text-right text-sm font-semibold text-gray-700">Actions</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            Email
+          </th>
+          <th scope="col" class="px-6 py-3 text-right text-sm font-semibold text-gray-700">
+            Actions
+          </th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
@@ -17,21 +34,29 @@
           </tr>
         <% else %>
           <%= for visitor <- @visitors do %>
-            <tr id={"visitor-#{visitor.id}"} class="hover:bg-gray-50 transition-colors duration-200">
+            <tr
+              id={"visitor-#{visitor.id}"}
+              class="hover:bg-gray-50 transition-colors duration-200"
+            >
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                <%= visitor.email %>
+                {visitor.email}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right relative">
-                <div class="tooltip" data-tip={if visitor.is_verified, do: "Verified", else: "Send verification email"}>
-                    <button 
-                      :if={!visitor.is_verified}
-                      phx-click="send-verification-email"
-                      phx-value-visitor_id={visitor.id}
-                      class="inline-flex items-center text-gray-400 hover:text-blue-500 transition-colors duration-200"
-                    >
-                      Verify Email
-                    </button>
-                    <span :if={visitor.is_verified} class="text-green-500">Verified</span>
+                <div
+                  class="tooltip"
+                  data-tip={
+                    if visitor.is_verified, do: "Verified", else: "Send verification email"
+                  }
+                >
+                  <button
+                    :if={!visitor.is_verified}
+                    phx-click="send-verification-email"
+                    phx-value-visitor_id={visitor.id}
+                    class="inline-flex items-center text-gray-400 hover:text-blue-500 transition-colors duration-200"
+                  >
+                    Verify Email
+                  </button>
+                  <span :if={visitor.is_verified} class="text-green-500">Verified</span>
                 </div>
               </td>
             </tr>

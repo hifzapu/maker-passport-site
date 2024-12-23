@@ -141,11 +141,22 @@ defmodule MakerPassport.Visitor do
       [%Visitor{}, ...]
 
   """
-  def list_visitors() do
+  def list_visitors(filters \\ %{}) do
     Visitor
+    |> filter_by_status(filters)
     |> order_by([v], asc: v.is_verified)
     |> Repo.all()
   end
+
+  def filter_by_status(query, %{"status" => "Email verified"}) do
+    from v in query, where: v.is_verified == true
+  end
+
+  def filter_by_status(query, %{"status" => "Email unverified"}) do
+    from v in query, where: v.is_verified == false
+  end
+
+  def filter_by_status(query, _), do: query
 
   @doc """
   Creates a email.
